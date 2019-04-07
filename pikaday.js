@@ -4,59 +4,21 @@
  * Copyright © 2014 David Bushell | BSD & MIT license | https://github.com/Pikaday/Pikaday
  */
 
-(function (root, factory)
-{
-    'use strict';
-
-    var moment;
-    if (typeof exports === 'object') {
-        // CommonJS module
-        // Load moment.js as an optional dependency
-        try { moment = require('moment'); } catch (e) {}
-        module.exports = factory(moment);
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(function (req)
-        {
-            // Load moment.js as an optional dependency
-            var id = 'moment';
-            try { moment = req(id); } catch (e) {}
-            return factory(moment);
-        });
-    } else {
-        root.Pikaday = factory(root.moment);
-    }
-}(this, function (moment)
-{
     'use strict';
 
     /**
      * feature detection and helper functions
      */
-    var hasMoment = typeof moment === 'function',
-
-    hasEventListeners = !!window.addEventListener,
-
-    document = window.document,
-
-    sto = window.setTimeout,
+    var
 
     addEvent = function(el, e, callback, capture)
     {
-        if (hasEventListeners) {
-            el.addEventListener(e, callback, !!capture);
-        } else {
-            el.attachEvent('on' + e, callback);
-        }
+        el.addEventListener(e, callback, !!capture);
     },
 
     removeEvent = function(el, e, callback, capture)
     {
-        if (hasEventListeners) {
-            el.removeEventListener(e, callback, !!capture);
-        } else {
-            el.detachEvent('on' + e, callback);
-        }
+        el.removeEventListener(e, callback, !!capture);
     },
 
     trim = function(str)
@@ -379,7 +341,7 @@
 
     renderWeek = function (d, m, y) {
         var date = new Date(y, m, d)
-          , week = hasMoment ? moment(date).isoWeek() : isoWeek(date)
+          , week = isoWeek(date)
         ;
 
         return '<td class="pika-week">' + week + '</td>';
@@ -496,7 +458,7 @@
                 if (hasClass(target, 'pika-button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
                     self.setDate(new Date(target.getAttribute('data-pika-year'), target.getAttribute('data-pika-month'), target.getAttribute('data-pika-day')));
                     if (opts.bound) {
-                        sto(function() {
+                        setTimeout(function() {
                             self.hide();
                             if (opts.blurFieldOnSelect && opts.field) {
                                 opts.field.blur();
@@ -576,9 +538,6 @@
         {
             if (opts.parse) {
                 return opts.parse(opts.field.value, opts.format);
-            } else if (hasMoment) {
-                var date = moment(opts.field.value, opts.format, opts.formatStrict);
-                return (date && date.isValid()) ? date.toDate() : null;
             } else {
                 return new Date(Date.parse(opts.field.value));
             }
@@ -622,7 +581,7 @@
             while ((pEl = pEl.parentNode));
 
             if (!self._c) {
-                self._b = sto(function() {
+                self._b = setTimeout(function() {
                     self.hide();
                 }, 50);
             }
@@ -636,12 +595,6 @@
                 pEl = target;
             if (!target) {
                 return;
-            }
-            if (!hasEventListeners && hasClass(target, 'pika-select')) {
-                if (!target.onchange) {
-                    target.setAttribute('onchange', 'return;');
-                    addEvent(target, 'change', self._onChange);
-                }
             }
             do {
                 if (hasClass(pEl, 'pika-single') || pEl === opts.trigger) {
@@ -781,28 +734,7 @@
             if (this._o.toString) {
               return this._o.toString(this._d, format);
             }
-            if (hasMoment) {
-              return moment(this._d).format(format);
-            }
             return this._d.toDateString();
-        },
-
-        /**
-         * return a Moment.js object of the current selection (if available)
-         */
-        getMoment: function()
-        {
-            return hasMoment ? moment(this._d) : null;
-        },
-
-        /**
-         * set the current selection from a Moment.js object (if available)
-         */
-        setMoment: function(date, preventOnSelect)
-        {
-            if (hasMoment && moment.isMoment(date)) {
-                this.setDate(date.toDate(), preventOnSelect);
-            }
         },
 
         /**
@@ -1053,7 +985,7 @@
 
             if (opts.bound) {
                 if(opts.field.type !== 'hidden') {
-                    sto(function() {
+                    setTimeout(function() {
                         opts.trigger.focus();
                     }, 1);
                 }
@@ -1292,5 +1224,4 @@
 
     };
 
-    return Pikaday;
-}));
+    module.exports = Pikaday;
