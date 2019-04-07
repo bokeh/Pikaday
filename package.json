@@ -11,6 +11,7 @@
   "bugs": "https://github.com/Pikaday/Pikaday/issues",
   "license": "(0BSD OR MIT)",
   "main": "pikaday.js",
+  "types": "pikaday.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/Pikaday/Pikaday.git"
